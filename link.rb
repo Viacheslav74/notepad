@@ -5,7 +5,7 @@ class Link < Post # объявление дочернего класса Link. P
   def initialize
     super # команда означает взять конструктор или метод из родительского класса
 
-    @url = '' # инициализируем специфичное для ссылки поле
+    @url = '' # инициализируем специфичное для класса Link поле ссылки
   end
 
   def read_from_console
@@ -24,5 +24,26 @@ class Link < Post # объявление дочернего класса Link. P
   def to_strings
   	time_string = "Создано: #{@created_at.strftime("%Y.%m.%d, %H:%M")} \n\r \n\r" # дата создания
   	return [@url, @text, time_string] # возвращаем массив
+  end
+
+  def to_db_hash
+    # вызываем родительский метод ключевым словом super и к хэшу, который он вернул
+    # присоединяем прицепом специфичные для этого класса поля методом Hash#merge
+    return super.merge(
+      {
+        'text' => @text,
+        'url' => @url
+      }
+    )
+  end
+
+   # загружаем свои поля из хэш массива
+  def load_data(data_hash)
+    super(data_hash) # сперва дергаем родительский метод для общих полей
+
+    # теперь прописываем свое специфичное поле
+   
+    @text = data_hash['text'].split('\n\r')
+    @url = data_hash['url']
   end
 end

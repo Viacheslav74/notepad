@@ -1,4 +1,5 @@
 # encoding: UTF-8
+
 class Memo < Post
 
   #def initialize по умолчанию конструктор класса Memo можно не писать, потому
@@ -31,9 +32,28 @@ class Memo < Post
   	# Сперва запишем в блокнот дату и время записи и сделаем отступ
     # \r – специальный дополнительный символ конца строки для Windows
    	time_string = "Создано: #{@created_at.strftime("%Y.%m.%d, %H:%M:%S")} \n\r \n\r"
-    #file.puts(time_string + "\n\r")
+    
     return @text.unshift(time_string) # метод unshift добавляет в начало массива строку time_string 
 
+  end
+
+   def to_db_hash
+    # вызываем родительский метод ключевым словом super и к хэшу, который он вернул
+    # присоединяем прицепом специфичные для этого класса поля методом Hash#merge
+    return super.merge(
+      {
+        'text' => @text.join('\n\r') # массив строк @text делаем одной большой строкой, 
+        #разделенной символами перевода строки
+      }
+    )
+  end
+
+   # загружаем свои поля из хэш массива
+  def load_data(data_hash)
+    super(data_hash) # сперва дергаем родительский метод для общих полей
+
+    # теперь прописываем свое специфичное поле
+    @text = data_hash['text'].split('\n\r')
   end
 
 end
